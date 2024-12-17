@@ -12,7 +12,7 @@ export default function Credentials() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/credentials`, {
+      const res = await axios.post(`https://real-time-scraper-backend-production.up.railway.app:3001/api/credentials`, {
         username,
         password,
         email,
