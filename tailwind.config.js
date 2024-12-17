@@ -1,10 +1,9 @@
-// frontend/tailwind.config.ts
+// frontend/tailwind.config.js
 module.exports = {
   darkMode: 'class', // Enable class-based dark mode
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
-    // Add other directories as needed
   ],
   theme: {
     extend: {},

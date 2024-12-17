@@ -1,0 +1,14 @@
+/* frontend/styles/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom global styles */
+body {
+  @apply bg-gray-900 text-white;
+}
+
+/* Smooth transitions for theme changes */
+html {
+  transition: background-color 0.3s, color 0.3s;
+}
