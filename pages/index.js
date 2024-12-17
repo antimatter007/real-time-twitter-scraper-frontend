@@ -1,4 +1,3 @@
-// frontend/pages/index.js
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Button from '../components/Button';
@@ -71,11 +70,6 @@ export default function Home() {
 
   const handleToggleDarkMode = () => {
     setDarkMode(!darkMode);
-    if (!darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
   };
 
   return (
@@ -86,7 +80,8 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
-      <div className="min-h-screen flex flex-col bg-gray-900 text-white">
+      {/* Top-level container with conditional classes for dark/light mode */}
+      <div className={`${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'} min-h-screen flex flex-col`}>
         {/* Header at the top, centered horizontally */}
         <div className="w-full flex justify-center p-4">
           <Header darkMode={darkMode} toggleDarkMode={handleToggleDarkMode} />
@@ -94,6 +89,10 @@ export default function Home() {
 
         {/* Main content area - flex-grow to fill space, flex-col and items-center for horizontal center */}
         <div className={`flex-grow flex flex-col items-center ${!(status || tweets.length > 0 || error) ? 'justify-center' : 'justify-start'} px-4`}>
+          
+          {/* X Logo Above Search Bar */}
+          <img src="/x-logo.png" alt="X Logo (Formerly Twitter)" className="mb-4 w-16 h-16" />
+
           {/* Search Form */}
           <form onSubmit={submitJob} className="w-full max-w-md flex flex-col items-center">
             <input
@@ -103,7 +102,7 @@ export default function Home() {
               placeholder="Search Twitter..."
               aria-label="Search Twitter"
               required
-              className="w-full px-4 py-3 rounded-full bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              className={`w-full px-4 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4 ${darkMode ? 'bg-gray-800 text-white' : 'bg-gray-200 text-black'}`}
             />
             <Button type="submit" isLoading={isLoading} disabled={isLoading}>
               {isLoading ? 'Searching...' : 'Search'}
@@ -176,7 +175,7 @@ export default function Home() {
 
         {/* Footer at the bottom, centered horizontally */}
         <footer className="w-full flex justify-center pb-4">
-          <div className="text-gray-500 dark:text-gray-400 text-sm text-center">
+          <div className={`${darkMode ? 'text-gray-500' : 'text-gray-700'} text-sm text-center`}>
             © {new Date().getFullYear()} Real-Time Twitter Scraper
           </div>
         </footer>
