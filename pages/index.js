@@ -22,7 +22,7 @@ export default function Home() {
     setIsLoading(true);
 
     try {
-      const res = await fetch('http://localhost:3001/api/jobs', {
+      const res = await fetch('https://real-time-scraper-backend-production.up.railway.app/api/jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query }),
@@ -46,7 +46,7 @@ export default function Home() {
 
     const interval = setInterval(async () => {
       try {
-        const res = await fetch(`http://localhost:3001/api/jobs/${jobId}`);
+        const res = await fetch(`https://real-time-scraper-backend-production.up.railway.app/api/jobs/${jobId}`);
         if (!res.ok) {
           throw new Error('Failed to fetch job status');
         }
