@@ -55,9 +55,9 @@ export default function Home() {
 
         // If completed or failed, stop polling and show whatever results we have
         if (data.status === 'completed' || data.status === 'failed') {
-          setTweets(data.results);
+          setTweets(data.results || []);
           clearInterval(interval);
-        }
+        }        
       } catch (err) {
         console.error(err);
         setError('Failed to fetch job status. Please check your connection.');
@@ -161,7 +161,7 @@ export default function Home() {
           )}
 
           {/* Results */}
-          {tweets.length > 0 && (
+          {tweets && tweets.length > 0 && (
             <div className="w-full max-w-md mt-8 pb-8">
               <h2 className="text-2xl font-semibold mb-4 text-center">Scraped Tweets:</h2>
               <ul className="space-y-4">
