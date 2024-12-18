@@ -31,6 +31,12 @@ export default function Home() {
 
       const data = await res.json();
       setJobId(data.jobId);
+
+      if (data.cached) {
+        // If cached, set status to completed and display results immediately
+        setStatus(data.status);
+        setTweets(data.results || []);
+      }
     } catch (err) {
       console.error(err);
       setError('Failed to submit job. Please ensure your backend is running and try again.');
@@ -39,6 +45,35 @@ export default function Home() {
       setIsLoading(false);
     }
   };
+
+useEffect(() => {
+  if (!jobId || status === 'completed' || status === 'failed' || !status) return;
+
+  const interval = setInterval(async () => {
+    try {
+      const res = await fetch(`https://real-time-scraper-backend-production.up.railway.app/api/jobs/${jobId}`);
+      if (!res.ok) {
+        throw new Error('Failed to fetch job status');
+      }
+
+      const data = await res.json();
+      setStatus(data.status);
+
+      // If completed or failed, stop polling and show whatever results we have
+      if (data.status === 'completed' || data.status === 'failed') {
+        setTweets(data.results || []);
+        clearInterval(interval);
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Failed to fetch job status. Please check your connection.');
+      clearInterval(interval);
+    }
+  }, 3000);
+
+  return () => clearInterval(interval);
+}, [jobId, status]);
+
 
   useEffect(() => {
     if (!jobId) return;
