@@ -110,7 +110,7 @@ useEffect(() => {
   return (
     <>
       <Head>
-        <title>Real-Time Twitter Scraper</title>
+        <title>Real-Time Reddit Scraper</title>
         <meta name="description" content="Scrape real-time tweets based on your search queries." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
@@ -126,7 +126,7 @@ useEffect(() => {
         <div className={`flex-grow flex flex-col items-center ${!(status || tweets.length > 0 || error) ? 'justify-center' : 'justify-start'} px-4`}>
           
           {/* X Logo Above Search Bar */}
-          <img src="/x-logo.png" alt="X Logo (Formerly Twitter)" className="mb-4 w-16 h-16" />
+          <img src="/x-logo.png" alt="Reddit Logo" className="mb-4 w-16 h-16" />
 
           {/* Search Form */}
           <form onSubmit={submitJob} className="w-full max-w-md flex flex-col items-center">
@@ -134,8 +134,8 @@ useEffect(() => {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search Twitter..."
-              aria-label="Search Twitter"
+              placeholder="Search Reddit..."
+              aria-label="Search Reddit"
               required
               className={`w-full px-4 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4 ${darkMode ? 'bg-gray-800 text-white' : 'bg-gray-200 text-black'}`}
             />
@@ -211,7 +211,7 @@ useEffect(() => {
         {/* Footer at the bottom, centered horizontally */}
         <footer className="w-full flex justify-center pb-4">
           <div className={`${darkMode ? 'text-gray-500' : 'text-gray-700'} text-sm text-center`}>
-            © {new Date().getFullYear()} Real-Time Twitter Scraper
+            © {new Date().getFullYear()} Real-Time Reddit Scraper
           </div>
         </footer>
       </div>
