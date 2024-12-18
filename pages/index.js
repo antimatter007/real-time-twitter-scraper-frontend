@@ -5,8 +5,8 @@ import Head from 'next/head';
 import Button from '../components/Button';
 import TweetCard from '../components/Tweetcard'; // Corrected import path
 import Header from '../components/Header';
-import { fetchWithRetry } from '../utils/fetchWithRetry';
 import { toast } from 'react-toastify';
+import { fetchWithRetry } from '../utils/fetchWithRetry';
 
 export default function Home() {
   const [query, setQuery] = useState('');
