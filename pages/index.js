@@ -5,6 +5,8 @@ import Head from 'next/head';
 import Button from '../components/Button';
 import TweetCard from '../components/Tweetcard'; // Corrected import path
 import Header from '../components/Header';
+import { toast } from 'react-toastify';
+import { fetchWithRetry } from '../utils/fetchWithRetry';
 
 export default function Home() {
   const [query, setQuery] = useState('');
@@ -23,6 +25,7 @@ export default function Home() {
   const inputRef = useRef(null);
 
   // Function to submit a new scraping job
+// Function to submit a new scraping job
   const submitJob = async (e, selectedQuery = null) => {
     if (e && e.preventDefault) e.preventDefault();
     setError('');
@@ -34,11 +37,16 @@ export default function Home() {
     const searchQuery = selectedQuery !== null ? selectedQuery : query;
 
     try {
-      const res = await fetch(`https://real-time-scraper-backend-production.up.railway.app/api/jobs`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: searchQuery }),
-      });
+      const res = await fetchWithRetry(
+        `https://real-time-scraper-backend-production.up.railway.app/api/jobs`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: searchQuery }),
+        },
+        3, // Number of retries
+        500 // Initial backoff delay in ms
+      );
 
       if (!res.ok) throw new Error('Failed to submit job');
 
@@ -64,10 +72,64 @@ export default function Home() {
     }
   };
 
+// Polling for job status
+  // Polling for job status
+useEffect(() => {
+  if (!jobId || status === 'completed' || status === 'failed' || !status) return;
+
+  const pollJobStatus = async () => {
+    try {
+      const res = await fetchWithRetry(
+        `https://real-time-scraper-backend-production.up.railway.app/api/jobs/${jobId}`,
+        {},
+        3, // Number of retries
+        500 // Initial backoff delay in ms
+      );
+
+      if (!res.ok) {
+        throw new Error('Failed to fetch job status');
+      }
+
+      const data = await res.json();
+      setStatus(data.status);
+
+      // If completed or failed, stop polling and show results
+      if (data.status === 'completed' || data.status === 'failed') {
+        setTweets(data.results || []);
+        clearInterval(interval);
+        // Optionally, refresh search history
+        fetchSearchHistory();
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Failed to fetch job status. Please check your connection.');
+      clearInterval(interval);
+    }
+  };
+
+  const interval = setInterval(pollJobStatus, 3000); // Poll every 3 seconds
+
+  return () => clearInterval(interval);
+}, [jobId, status]);
+
   // Function to fetch search history from the backend
   const fetchSearchHistory = async () => {
     try {
-      const res = await fetch(`https://real-time-scraper-backend-production.up.railway.app/api/search-history?limit=10`);
+      const res = await fetchWithRetry(
+        `https://real-time-scraper-backend-production.up.railway.app/api/search-history?limit=10`,
+        {},
+        3, // Number of retries
+        500, // Initial backoff delay in ms
+        (attempt, delay, error) => {
+          // onRetry callback
+          toast.warn(`Retrying fetch history... Attempt ${attempt}`);
+        },
+        (error) => {
+          // onFailure callback
+          toast.error('Failed to fetch search history after multiple attempts.');
+        }
+      );
+
       if (!res.ok) throw new Error('Failed to fetch search history');
       const data = await res.json();
       setSearchHistory(data.history);
@@ -86,9 +148,23 @@ export default function Home() {
   useEffect(() => {
     if (!jobId || status === 'completed' || status === 'failed' || !status) return;
 
-    const interval = setInterval(async () => {
+    const pollJobStatus = async () => {
       try {
-        const res = await fetch(`https://real-time-scraper-backend-production.up.railway.app/api/jobs/${jobId}`);
+        const res = await fetchWithRetry(
+          `https://real-time-scraper-backend-production.up.railway.app/api/jobs/${jobId}`,
+          {},
+          3, // Number of retries
+          500, // Initial backoff delay in ms
+          (attempt, delay, error) => {
+            // onRetry callback
+            toast.warn(`Retrying job status fetch... Attempt ${attempt}`);
+          },
+          (error) => {
+            // onFailure callback
+            toast.error('Failed to fetch job status after multiple attempts.');
+          }
+        );
+
         if (!res.ok) {
           throw new Error('Failed to fetch job status');
         }
@@ -108,7 +184,9 @@ export default function Home() {
         setError('Failed to fetch job status. Please check your connection.');
         clearInterval(interval);
       }
-    }, 3000); // Poll every 3 seconds
+    };
+
+    const interval = setInterval(pollJobStatus, 3000); // Poll every 3 seconds
 
     return () => clearInterval(interval);
   }, [jobId, status]);
@@ -195,7 +273,7 @@ export default function Home() {
       <div
         className={`${
           darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'
-        } min-h-screen flex flex-col`}
+        } min-h-screen flex flex-col transition-colors duration-300`}
       >
         {/* Header at the top, centered horizontally */}
         <div className="w-full flex justify-center p-4">
@@ -356,7 +434,7 @@ export default function Home() {
               <h2 className="text-2xl font-semibold mb-4 text-center">Scraped Posts:</h2>
               <ul className="space-y-4">
                 {tweets.map((tweet) => (
-                  <TweetCard key={tweet.tweet_id} tweet={tweet} />
+                  <TweetCard key={tweet.tweet_id} tweet={tweet} darkMode={darkMode} />
                 ))}
               </ul>
             </div>
