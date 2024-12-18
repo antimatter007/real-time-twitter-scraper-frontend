@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
+import Image from 'next/image'; // Import Next.js Image component
 import Button from '../components/Button';
 import TweetCard from '../components/Tweetcard'; // Corrected import path
 import Header from '../components/Header';
-import { toast } from 'react-toastify';
 import { fetchWithRetry } from '../utils/fetchWithRetry';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Home() {
   const [query, setQuery] = useState('');
@@ -45,11 +47,11 @@ export default function Home() {
         },
         3, // Number of retries
         500, // Initial backoff delay in ms
-        (attempt, delay, error) => {
+        (attempt) => {
           // onRetry callback
           toast.warn(`Retrying submission... Attempt ${attempt}`);
         },
-        (error) => {
+        () => {
           // onFailure callback
           toast.error('Failed to submit job after multiple attempts.');
         }
@@ -66,6 +68,7 @@ export default function Home() {
         setTweets(data.results || []);
         // Optionally, refresh search history
         fetchSearchHistory();
+        toast.success('Displaying cached results.');
       } else {
         // If not cached, start polling for job status
         setStatus('pending');
@@ -87,11 +90,11 @@ export default function Home() {
         {},
         3, // Number of retries
         500, // Initial backoff delay in ms
-        (attempt, delay, error) => {
+        (attempt) => {
           // onRetry callback
           toast.warn(`Retrying fetch history... Attempt ${attempt}`);
         },
-        (error) => {
+        () => {
           // onFailure callback
           toast.error('Failed to fetch search history after multiple attempts.');
         }
@@ -122,11 +125,11 @@ export default function Home() {
           {},
           3, // Number of retries
           500, // Initial backoff delay in ms
-          (attempt, delay, error) => {
+          (attempt) => {
             // onRetry callback
             toast.warn(`Retrying job status fetch... Attempt ${attempt}`);
           },
-          (error) => {
+          () => {
             // onFailure callback
             toast.error('Failed to fetch job status after multiple attempts.');
           }
@@ -145,6 +148,12 @@ export default function Home() {
           clearInterval(interval);
           // Optionally, refresh search history
           fetchSearchHistory();
+
+          if (data.status === 'completed') {
+            toast.success('Job completed successfully!');
+          } else {
+            toast.error('Job failed to complete.');
+          }
         }
       } catch (err) {
         console.error(err);
@@ -220,10 +229,26 @@ export default function Home() {
     }
   };
 
-  // Toggle dark mode
+  // Toggle dark mode and persist preference
   const handleToggleDarkMode = () => {
     setDarkMode(!darkMode);
+    // Persist preference in localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('darkMode', !darkMode);
+    }
   };
+
+  // Initialize dark mode from localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedMode = localStorage.getItem('darkMode');
+      if (storedMode !== null) {
+        setDarkMode(storedMode === 'true');
+      } else {
+        setDarkMode(true); // Default to dark mode
+      }
+    }
+  }, []);
 
   return (
     <>
@@ -235,6 +260,9 @@ export default function Home() {
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
+
+      {/* Toast Container for Notifications */}
+      <ToastContainer />
 
       {/* Top-level container with conditional classes for dark/light mode */}
       <div
@@ -254,11 +282,15 @@ export default function Home() {
           } px-4`}
         >
           {/* Logo Above Search Bar */}
-          <img
-            src="/reddit-logo.png" // Ensure you have a reddit-logo.png in your public folder
-            alt="Reddit Logo"
-            className="mb-4 w-16 h-16"
-          />
+          <div className="mb-4 w-16 h-16">
+            <Image
+              src="/reddit-logo.png" // Ensure you have a reddit-logo.png in your public folder
+              alt="Reddit Logo"
+              width={64}
+              height={64}
+              priority
+            />
+          </div>
 
           {/* Search Form */}
           <div className="w-full max-w-md relative">
