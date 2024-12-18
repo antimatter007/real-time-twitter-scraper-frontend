@@ -34,7 +34,7 @@ export default function Home() {
     const searchQuery = selectedQuery !== null ? selectedQuery : query;
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/jobs`, {
+      const res = await fetch(`https://real-time-scraper-backend-production.up.railway.app/api/jobs`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: searchQuery }),
@@ -67,7 +67,7 @@ export default function Home() {
   // Function to fetch search history from the backend
   const fetchSearchHistory = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/search-history?limit=10`);
+      const res = await fetch(`https://real-time-scraper-backend-production.up.railway.app/api/search-history?limit=10`);
       if (!res.ok) throw new Error('Failed to fetch search history');
       const data = await res.json();
       setSearchHistory(data.history);
@@ -88,7 +88,7 @@ export default function Home() {
 
     const interval = setInterval(async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/jobs/${jobId}`);
+        const res = await fetch(`https://real-time-scraper-backend-production.up.railway.app/api/jobs/${jobId}`);
         if (!res.ok) {
           throw new Error('Failed to fetch job status');
         }
