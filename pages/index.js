@@ -235,7 +235,9 @@ export default function Home() {
               {showDropdown && filteredHistory.length > 0 && (
                 <div
                   ref={dropdownRef}
-                  className={`absolute top-12 left-0 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-lg z-10`}
+                  className={`absolute top-12 left-0 w-full ${
+                    darkMode ? 'bg-gray-800' : 'bg-white'
+                  } border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg z-10 text-black dark:text-white`}
                 >
                   <ul className="max-h-60 overflow-y-auto">
                     {filteredHistory.map((historyQuery, index) => {
@@ -265,8 +267,12 @@ export default function Home() {
                           onClick={() => handleSelectHistory(historyQuery)}
                           className={`px-4 py-2 cursor-pointer ${
                             index === focusedIndex
-                              ? 'bg-gray-100 dark:bg-gray-700'
-                              : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                              ? darkMode
+                                ? 'bg-gray-700'
+                                : 'bg-gray-100'
+                              : darkMode
+                              ? 'hover:bg-gray-700'
+                              : 'hover:bg-gray-100'
                           }`}
                           onMouseEnter={() => setFocusedIndex(index)}
                         >
