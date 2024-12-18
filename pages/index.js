@@ -5,8 +5,8 @@ import Head from 'next/head';
 import Button from '../components/Button';
 import TweetCard from '../components/Tweetcard'; // Corrected import path
 import Header from '../components/Header';
-import { toast } from 'react-toastify';
 import { fetchWithRetry } from '../utils/fetchWithRetry';
+import { toast } from 'react-toastify';
 
 export default function Home() {
   const [query, setQuery] = useState('');
@@ -25,7 +25,6 @@ export default function Home() {
   const inputRef = useRef(null);
 
   // Function to submit a new scraping job
-// Function to submit a new scraping job
   const submitJob = async (e, selectedQuery = null) => {
     if (e && e.preventDefault) e.preventDefault();
     setError('');
@@ -45,7 +44,15 @@ export default function Home() {
           body: JSON.stringify({ query: searchQuery }),
         },
         3, // Number of retries
-        500 // Initial backoff delay in ms
+        500, // Initial backoff delay in ms
+        (attempt, delay, error) => {
+          // onRetry callback
+          toast.warn(`Retrying submission... Attempt ${attempt}`);
+        },
+        (error) => {
+          // onFailure callback
+          toast.error('Failed to submit job after multiple attempts.');
+        }
       );
 
       if (!res.ok) throw new Error('Failed to submit job');
@@ -71,46 +78,6 @@ export default function Home() {
       setIsLoading(false);
     }
   };
-
-// Polling for job status
-  // Polling for job status
-useEffect(() => {
-  if (!jobId || status === 'completed' || status === 'failed' || !status) return;
-
-  const pollJobStatus = async () => {
-    try {
-      const res = await fetchWithRetry(
-        `https://real-time-scraper-backend-production.up.railway.app/api/jobs/${jobId}`,
-        {},
-        3, // Number of retries
-        500 // Initial backoff delay in ms
-      );
-
-      if (!res.ok) {
-        throw new Error('Failed to fetch job status');
-      }
-
-      const data = await res.json();
-      setStatus(data.status);
-
-      // If completed or failed, stop polling and show results
-      if (data.status === 'completed' || data.status === 'failed') {
-        setTweets(data.results || []);
-        clearInterval(interval);
-        // Optionally, refresh search history
-        fetchSearchHistory();
-      }
-    } catch (err) {
-      console.error(err);
-      setError('Failed to fetch job status. Please check your connection.');
-      clearInterval(interval);
-    }
-  };
-
-  const interval = setInterval(pollJobStatus, 3000); // Poll every 3 seconds
-
-  return () => clearInterval(interval);
-}, [jobId, status]);
 
   // Function to fetch search history from the backend
   const fetchSearchHistory = async () => {
