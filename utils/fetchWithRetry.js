@@ -41,7 +41,7 @@ export async function fetchWithRetry(
           const delayTime = backoff * 2 ** attempt;
   
           console.warn(`Fetch attempt ${attempt + 1} failed. Retrying in ${delayTime}ms...`, error);
-          onRetry(attempt + 1, delayTime, error);
+          onRetry(attempt + 1);
   
           await new Promise((resolve) => setTimeout(resolve, delayTime));
         } else {
