@@ -1,4 +1,3 @@
-// frontend/components/Tweetcard.js
 export default function TweetCard({ tweet }) {
   return (
     <li className="p-4 bg-gray-800 dark:bg-gray-700 rounded-lg shadow-md">

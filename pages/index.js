@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import Button from '../components/Button';
-import TweetCard from '../components/TweetCard'; // Corrected import path
+import TweetCard from '../components/Tweetcard'; // Corrected import path
 import Header from '../components/Header';
 
 export default function Home() {
