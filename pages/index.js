@@ -237,7 +237,9 @@ export default function Home() {
                   ref={dropdownRef}
                   className={`absolute top-12 left-0 w-full ${
                     darkMode ? 'bg-gray-800' : 'bg-white'
-                  } border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg z-10 text-black dark:text-white`}
+                  } border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg z-10 ${
+                    darkMode ? 'text-white' : 'text-black'
+                  }`}
                 >
                   <ul className="max-h-60 overflow-y-auto">
                     {filteredHistory.map((historyQuery, index) => {
