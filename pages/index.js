@@ -1,9 +1,9 @@
-// pages/index.js
+// frontend/pages/index.js
 
 import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import Button from '../components/Button';
-import TweetCard from '../components/Tweetcard';
+import TweetCard from '../components/TweetCard'; // Corrected import path
 import Header from '../components/Header';
 
 export default function Home() {
@@ -12,7 +12,7 @@ export default function Home() {
   const [status, setStatus] = useState('');
   const [tweets, setTweets] = useState([]);
   const [error, setError] = useState('');
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true); // Set default to dark mode
   const [isLoading, setIsLoading] = useState(false);
   const [searchHistory, setSearchHistory] = useState([]);
   const [filteredHistory, setFilteredHistory] = useState([]);
